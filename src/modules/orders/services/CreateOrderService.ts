@@ -49,6 +49,10 @@ class CreateOrderService {
         throw new AppError('Product does not exists', 400);
       }
 
+      if (findProduct.quantity < product.quantity) {
+        throw new AppError('There is not enough stock', 400);
+      }
+
       const selectedProduct = {
         product_id: product.id,
         price: findProduct.price,
@@ -57,6 +61,8 @@ class CreateOrderService {
 
       return selectedProduct;
     });
+
+    await this.productsRepository.updateQuantity(products);
 
     const order = await this.ordersRepository.create({
       customer,
